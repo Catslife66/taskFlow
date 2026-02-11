@@ -1,0 +1,13 @@
+alembic
+email_validator
+fastapi
+pwdlib[argon2]
+pydantic
+python-decouple
+python-dotenv
+python-multipart
+psycopg2-binary
+httpx
+SQLAlchemy
+sqlmodel
+uvicorn[standard]
