@@ -29,3 +29,9 @@ class TaskOutSchema(TaskBaseSchema):
     created_at: datetime
     updated_at: datetime
 
+
+class PaginatedTaskResponse(SQLModel):
+    items: list[TaskOutSchema]
+    total: int
+    limit: int
+    offset: int

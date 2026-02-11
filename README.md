@@ -115,7 +115,7 @@ TaskFlow is a task management web application built to practice industry-standar
 ## Planned Milestones (Evolution)
 
 - Phase 1: Core app (Postgres sessions, no Redis dependency)
-- Phase 2: Add Nginx routing
+- Phase 2: Frontend MVP (Next.js) & Add Nginx routing
 - Phase 3: Migrate session storage to Redis
 - Phase 4: Production deployment + HTTPS
 - Phase 5: Observability and reliability improvements

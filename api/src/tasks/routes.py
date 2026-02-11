@@ -3,7 +3,7 @@ from typing import Optional
 from sqlmodel import Session
 
 from src.users.dependencies import get_current_user
-from .schemas import TaskInSchema, TaskOutSchema, TaskUpdateSchema
+from .schemas import PaginatedTaskResponse, TaskInSchema, TaskOutSchema, TaskUpdateSchema
 from .services import create_task, update_task, delete_task, get_tasks
 from src.db.models import User
 from src.db.session import get_session
@@ -12,7 +12,7 @@ from src.db.session import get_session
 router = APIRouter()
 
 
-@router.get("", response_model=list[TaskOutSchema])
+@router.get("", response_model=PaginatedTaskResponse)
 def list_my_tasks(
     status: Optional[str] = None,
     priority: Optional[str] = None,

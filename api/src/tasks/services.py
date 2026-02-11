@@ -1,5 +1,6 @@
 from fastapi import Depends, HTTPException, Query, status
 from typing import Optional
+from sqlalchemy import func
 from sqlmodel import Session, select
 
 from .schemas import TaskInSchema, TaskUpdateSchema
@@ -32,22 +33,29 @@ def get_tasks(
     limit: int = 20,
     offset: int = 0,
 ) -> list[Task]: 
-    query = select(Task).where(Task.user_id == user.id)
-
+    base_query = select(Task).where(Task.user_id == user.id)
+    all_tasks = session.exec(base_query).all()
+    total = len(all_tasks)
+    
     if status:
-        query = query.where(Task.status == status.upper())
+        base_query = base_query.where(Task.status == status.upper())
 
     if priority:
-        query = query.where(Task.priority == priority.upper())
-
+        base_query = base_query.where(Task.priority == priority.upper())
+    
     query = (
-        query.order_by(Task.created_at.desc())
+        base_query.order_by(Task.created_at.desc())
              .limit(limit)
              .offset(offset)
     )
+    paginated_tasks = session.exec(query).all()
 
-    tasks = session.exec(query).all()
-    return list(tasks)
+    return {
+        "items": list(paginated_tasks),
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+    }
 
 
 def _get_users_task_or_404(

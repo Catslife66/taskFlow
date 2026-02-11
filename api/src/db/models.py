@@ -3,8 +3,8 @@ from datetime import datetime
 from typing import Optional
 import uuid
 
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import DateTime, ForeignKey, String, func, Enum as SAEnum
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
