@@ -18,11 +18,12 @@ services:
   db:
     image: postgres:16
     container_name: taskflow_db
-    restart: always
     env_file:
       - ../api/.env
     ports:
       - "5432:5432"
+    networks:
+      - task_network
     volumes:
       - pg_data:/var/lib/postgresql/data
 
@@ -38,8 +39,10 @@ services:
     networks:
       - task_network
     volumes:
-      - ./frontend:/app
+      - ../frontend:/app
       - /app/node_modules
+    depends_on:
+      - api
 
 networks:
   task_network:
