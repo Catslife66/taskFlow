@@ -1,7 +1,37 @@
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 
-type FetchOptions = RequestInit & { json?: unknown };
+export type ApiErrorPayload = {
+  error: {
+    code: string;
+    message: string;
+    details?: unknown;
+  };
+};
+
+export class ApiError extends Error {
+  status: number;
+  code: string;
+  details?: unknown;
+  raw?: unknown;
+
+  constructor(args: {
+    status: number;
+    code: string;
+    message: string;
+    details?: unknown;
+    raw?: unknown;
+  }) {
+    super(args.message);
+    this.name = "ApiError";
+    this.status = args.status;
+    this.code = args.code;
+    this.details = args.details;
+    this.raw = args.raw;
+  }
+}
+
+type FetchOptions = Omit<RequestInit, "body"> & { json?: unknown };
 
 export async function apiFetch<T>(
   path: string,
@@ -14,19 +44,37 @@ export async function apiFetch<T>(
       ...(json ? { "Content-Type": "application/json" } : {}),
       ...(headers ?? {}),
     },
-    body: json ? JSON.stringify(json) : rest.body,
+    body: json !== "undefined" ? JSON.stringify(json) : "undefined",
     credentials: "include",
   });
 
   const contentType = res.headers.get("Content-Type") || "";
-  const data = contentType.includes("application/json")
+  const rawBody = contentType.includes("application/json")
     ? await res.json()
     : await res.text();
 
-  if (!res.ok) {
-    const message =
-      typeof data === "string" ? data : (data?.detail ?? "Request failed");
-    throw new Error(message);
+  if (res.ok) return rawBody as T;
+
+  const maybeApiError = rawBody as Partial<ApiErrorPayload>;
+  if (maybeApiError?.error?.code && maybeApiError?.error?.message) {
+    throw new ApiError({
+      status: res.status,
+      code: maybeApiError.error.code,
+      message: maybeApiError.error.message,
+      details: maybeApiError.error.details,
+      raw: rawBody,
+    });
   }
-  return data as T;
+
+  const fallbackMessage =
+    typeof rawBody === "string" && rawBody.trim().length > 0
+      ? rawBody
+      : `Request failed (${res.status})`;
+
+  throw new ApiError({
+    status: res.status,
+    code: "UNKNOWN_ERROR",
+    message: fallbackMessage,
+    raw: rawBody,
+  });
 }

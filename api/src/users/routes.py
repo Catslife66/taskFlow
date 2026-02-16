@@ -14,12 +14,8 @@ router = APIRouter()
 
 @router.post("/register", response_model=UserOutSchema)
 def register(payload: UserInSchema, session: Session = Depends(get_session)):
-    try:
-        user = register_user(payload, session)
-        return user
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-
+    return register_user(payload, session)
+   
 
 @router.post("/login")
 def login(
@@ -28,9 +24,6 @@ def login(
         session: Session = Depends(get_session),
     ):
     user = authenticate_user(payload, session)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=USER_UNAUTH_ERR)
-
     sess = create_session(user.id, session)
 
     response.set_cookie(
