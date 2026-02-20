@@ -39,19 +39,37 @@ export async function apiFetch<T>(
 ): Promise<T> {
   const { json, headers, ...rest } = options;
   const res = await fetch(`${API_BASE}${path}`, {
-    ...rest,
     headers: {
-      ...(json ? { "Content-Type": "application/json" } : {}),
+      "Content-Type": "application/json",
       ...(headers ?? {}),
     },
-    body: json !== "undefined" ? JSON.stringify(json) : "undefined",
+    body: json !== undefined ? JSON.stringify(json) : undefined,
     credentials: "include",
+    ...rest,
   });
 
-  const contentType = res.headers.get("Content-Type") || "";
-  const rawBody = contentType.includes("application/json")
-    ? await res.json()
-    : await res.text();
+  if (res.status === 204) {
+    if (res.ok) return undefined as T;
+    throw new ApiError({
+      status: res.status,
+      code: "HTTP_ERROR",
+      message: `Request failed (${res.status})`,
+    });
+  }
+
+  const contentType = (res.headers.get("content-type") ?? "").toLowerCase();
+  let rawBody: unknown = undefined;
+
+  if (contentType.includes("application/json")) {
+    try {
+      rawBody = await res.json();
+    } catch {
+      rawBody = undefined;
+    }
+  } else {
+    const text = await res.text();
+    rawBody = text.trim().length ? text : undefined;
+  }
 
   if (res.ok) return rawBody as T;
 

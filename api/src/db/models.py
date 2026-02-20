@@ -50,8 +50,8 @@ class Task(Base):
     priority: Mapped[Priority] = mapped_column(SAEnum(Priority), default=Priority.MEDIUM, nullable=False)
     due_datetime: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=func.now(),
+        DateTime(timezone=True), 
+        server_default=func.now(), 
         nullable=False
     )
     updated_at: Mapped[datetime] = mapped_column(

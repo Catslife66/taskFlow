@@ -1,8 +1,8 @@
-"""init
+"""init schema
 
-Revision ID: 9108113fd3b1
+Revision ID: 0256e3700ee4
 Revises: 
-Create Date: 2026-02-10 12:36:24.782166
+Create Date: 2026-02-17 14:53:02.316861
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '9108113fd3b1'
+revision: str = '0256e3700ee4'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -25,14 +25,14 @@ def upgrade() -> None:
     sa.Column('id', sa.Uuid(), nullable=False),
     sa.Column('email', sa.String(length=50), nullable=False),
     sa.Column('password_hash', sa.String(), nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
     op.create_table('sessions',
     sa.Column('id', sa.Uuid(), nullable=False),
     sa.Column('user_id', sa.UUID(), nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('expires_at', sa.DateTime(timezone=True), nullable=False),
     sa.Column('revoked_at', sa.DateTime(timezone=True), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
@@ -43,11 +43,11 @@ def upgrade() -> None:
     sa.Column('id', sa.Uuid(), nullable=False),
     sa.Column('user_id', sa.UUID(), nullable=False),
     sa.Column('title', sa.String(length=255), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('priority', sa.String(length=20), nullable=False),
+    sa.Column('status', sa.Enum('TODO', 'DONE', name='status'), nullable=False),
+    sa.Column('priority', sa.Enum('LOW', 'MEDIUM', 'HIGH', name='priority'), nullable=False),
     sa.Column('due_datetime', sa.DateTime(timezone=True), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
-    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -44,7 +45,14 @@ export default function LoginForm() {
     }
   }
 
+  useEffect(() => {
+    if (!auth.loading && auth.user) {
+      router.replace(next ?? "/");
+    }
+  }, [auth.loading, auth.user, router, next]);
+
   if (auth.loading) return null;
+  if (auth.user) return null;
 
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
