@@ -15,7 +15,7 @@ def get_current_user(
     if not session_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=NO_SESSION_ERR)
 
-    sess = session.execute(select(UserSession).where(UserSession.id == session_id)).scalar_one_or_none()
+    sess = session.exec(select(UserSession).where(UserSession.id == session_id)).one_or_none()
     if not sess:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=INVALID_SESSION_ERR)
 

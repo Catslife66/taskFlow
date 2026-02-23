@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { LoginInput, loginSchema } from "@/lib/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ApiError } from "@/lib/api";
+import ErrorAlert from "./ErrorAlert";
 
 export default function LoginForm() {
   const auth = useAuth();
@@ -62,20 +63,12 @@ export default function LoginForm() {
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
               Sign in to your task manager
             </h1>
-            {errors?.email && (
-              <div className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50">
-                {errors.email.message}
-              </div>
-            )}
+            {errors?.email && <ErrorAlert errMsg={errors.email.message} />}
             {errors?.password && (
-              <div className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50">
-                {errors.password.message}
-              </div>
+              <ErrorAlert errMsg={errors.password.message} />
             )}
             {"root" in errors && errors.root?.message && (
-              <div className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50">
-                {errors.root.message}
-              </div>
+              <ErrorAlert errMsg={errors.root.message} />
             )}
             <form
               className="space-y-4 md:space-y-6"

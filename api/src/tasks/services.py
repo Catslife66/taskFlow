@@ -1,12 +1,11 @@
-from fastapi import Depends, HTTPException, Query, status
+from fastapi import Depends, HTTPException, status
 from typing import Optional
-from sqlalchemy import func
-from sqlmodel import Session, select
+from sqlmodel import Session, select, func
 
 from .schemas import TaskInSchema, TaskUpdateSchema
 from src.core.exceptions import TASK_NOT_FOUND_ERR
 from src.db.session import get_session
-from src.db.models import User, Task, Priority, Status
+from src.db.models import User, Task
 from src.users.dependencies import get_current_user
 
 
@@ -33,26 +32,25 @@ def get_tasks(
     limit: int = 20,
     offset: int = 0,
 ) -> list[Task]: 
-    base_query = select(Task).where(Task.user_id == user.id)
-    all_tasks = session.exec(base_query).all()
-    total = len(all_tasks)
+    total_tasks = select(func.count(Task.id)).where(Task.user_id == user.id)
+    tasks_count = session.exec(total_tasks).one()
     
+    base_query = select(Task).where(Task.user_id == user.id)
     if status:
         base_query = base_query.where(Task.status == status.upper())
-
     if priority:
         base_query = base_query.where(Task.priority == priority.upper())
     
     query = (
         base_query.order_by(Task.created_at.desc())
-             .limit(limit)
-             .offset(offset)
+                  .limit(limit)
+                  .offset(offset)
     )
     paginated_tasks = session.exec(query).all()
 
     return {
         "items": list(paginated_tasks),
-        "total": total,
+        "total": tasks_count,
         "limit": limit,
         "offset": offset,
     }

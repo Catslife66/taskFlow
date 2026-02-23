@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import ErrorAlert from "./ErrorAlert";
 
 const REGISTER_API_PATH = "/api/auth/register";
 
@@ -71,20 +72,12 @@ export default function RegisterForm() {
               </div>
             )}
 
-            {errors?.email && (
-              <div className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50">
-                {errors.email.message}
-              </div>
-            )}
+            {errors?.email && <ErrorAlert errMsg={errors.email.message} />}
             {errors?.password && (
-              <div className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50">
-                {errors.password.message}
-              </div>
+              <ErrorAlert errMsg={errors.password.message} />
             )}
             {"root" in errors && errors.root?.message && (
-              <div className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50">
-                {errors.root.message}
-              </div>
+              <ErrorAlert errMsg={errors.root.message} />
             )}
             <form
               className="space-y-4 md:space-y-6"

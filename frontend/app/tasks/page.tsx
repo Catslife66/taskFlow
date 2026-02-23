@@ -1,6 +1,9 @@
 "use client";
 
+import ErrorAlert from "@/components/ErrorAlert";
+import Pagination from "@/components/Pagination";
 import RequireAuth from "@/components/RequireAuth";
+import SuccessToast from "@/components/SuccessToast";
 import TaskCard from "@/components/TaskCard";
 import TaskForm from "@/components/TaskForm";
 import { ApiError, apiFetch } from "@/lib/api";
@@ -15,20 +18,27 @@ export default function page() {
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const LIMIT = 10;
 
   function showSuccessMsg(msg: string) {
     setSuccessMsg(msg);
     setTimeout(() => setSuccessMsg(null), 1000);
   }
 
-  async function fetchTasks() {
+  async function fetchTasks(currentPage = page) {
     try {
-      setLoading(true);
       setError(null);
-      const res = await apiFetch<PaginatedTask>(FETCH_TASKS_API_PATH, {
-        method: "GET",
-      });
+      setLoading(true);
+      const offset = (currentPage - 1) * LIMIT;
+      const res = await apiFetch<PaginatedTask>(
+        `${FETCH_TASKS_API_PATH}?limit=${LIMIT}&offset=${offset}`,
+        { method: "GET" },
+      );
       setTasks(res.items);
+      const total = Math.ceil(res.total / LIMIT);
+      setTotalPages(total);
     } catch (e) {
       if (e instanceof ApiError) {
         setError(e.message);
@@ -55,9 +65,15 @@ export default function page() {
     }
   }
 
+  function changePage(newPage: number) {
+    if (newPage < 1) return;
+    if (newPage > totalPages) return;
+    setPage(newPage);
+  }
+
   useEffect(() => {
     fetchTasks();
-  }, []);
+  }, [page]);
 
   return (
     <RequireAuth>
@@ -71,37 +87,12 @@ export default function page() {
               fetchTasks();
             }}
           />
-          {error && (
-            <div className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50">
-              {error}
-            </div>
-          )}
-          {loading && <div>Loading tasks...</div>}
-          {successMsg && (
-            <div className="flex items-center w-full max-w-sm p-4">
-              <div className="inline-flex items-center justify-center shrink-0 w-7 h-7 bg-green-50 rounded">
-                <svg
-                  className="w-5 h-5"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 11.917 9.724 16.5 19 7.5"
-                  />
-                </svg>
-              </div>
-              <div className="ms-3 text-sm font-normal">{successMsg}</div>
-            </div>
-          )}
+          {error && <ErrorAlert errMsg={error} />}
+
+          {successMsg && <SuccessToast msg={successMsg} />}
+
           <div className="flex flex-col space-y-4">
+            {loading && <div>Loading tasks...</div>}
             {tasks.length > 0 ? (
               tasks.map((task, idx) => (
                 <Fragment key={task.id}>
@@ -167,6 +158,11 @@ export default function page() {
             )}
           </div>
         </div>
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={changePage}
+        />
       </div>
     </RequireAuth>
   );

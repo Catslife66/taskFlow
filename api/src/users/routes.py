@@ -1,11 +1,10 @@
-from fastapi import APIRouter, Cookie, Depends, HTTPException, status, Response
+from fastapi import APIRouter, Cookie, Depends, Response
 from sqlmodel import Session
 
 from .dependencies import get_current_user
 from .schemas import UserInSchema, UserOutSchema
 from .services import register_user, authenticate_user, create_session, revoke_session
 from src.core.config import SESSION_COOKIE_NAME, COOKIE_SECURE, COOKIE_SAMESITE
-from src.core.exceptions import USER_UNAUTH_ERR
 from src.db.models import User
 from src.db.session import get_session
 
@@ -42,7 +41,6 @@ def logout(
         response:Response, 
         session_id: str | None = Cookie(default=None, alias=SESSION_COOKIE_NAME),
         session: Session = Depends(get_session), 
-        user: User = Depends(get_current_user)
     ):
     if session_id:
         revoke_session(session_id, session)

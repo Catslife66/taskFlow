@@ -27,7 +27,7 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
     if isinstance(detail, Dict):
         code = str(detail.get("code", "HTTP_ERROR"))
         message = str(detail.get("message", "Request failed"))
-        details = detail.get("details")
+        details = detail.get("details", None)
         return error_response(status_code=exc.status_code, code=code, message=message, details=details)
 
     if isinstance(detail, str):
@@ -39,8 +39,9 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     field_errors = []
     for e in exc.errors():
         loc = e.get("loc", [])
+        field = loc[1] if loc else "non_field"
         msg = e.get("msg", "Invalid input")
-        field_errors.append({"loc": list(loc), "message": msg})
+        field_errors[str(field)] = msg
 
     return error_response(
         status_code=422,

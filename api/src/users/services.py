@@ -6,7 +6,7 @@ from sqlmodel import Session, select
 from .schemas import UserInSchema
 from src.core.config import SESSION_TTL_SECONDS
 from src.core.exceptions import USER_NOT_FOUND_ERR, USER_CONFLICT_ERR, USER_UNAUTH_ERR
-from src.core.security import get_password_hash, verify_password
+from src.core.security import make_password_hash, verify_password
 from src.db.session import get_session
 from src.db.models import User, Session as UserSession
 
@@ -15,7 +15,7 @@ def register_user(payload: UserInSchema, session: Session = Depends(get_session)
     existing = session.exec(select(User).where(User.email == payload.email)).one_or_none()
     if existing:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=USER_CONFLICT_ERR)
-    user = User(email=payload.email, password_hash=get_password_hash(payload.password))
+    user = User(email=payload.email, password_hash=make_password_hash(payload.password))
     session.add(user)
     session.commit()
     session.refresh(user)

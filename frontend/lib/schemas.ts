@@ -16,7 +16,10 @@ export const registerSchema = z.object({
 
 export const loginSchema = z.object({
   email: z.email("Invalid email address"),
-  password: z.string().min(1, "Password cannot be empty."),
+  password: z
+    .string()
+    .min(1, "Password cannot be empty.")
+    .max(100, "Max length is 100 characters."),
 });
 
 export const taskCreateSchema = z.object({
