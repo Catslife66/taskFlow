@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Query, status
 from typing import Optional
 from sqlmodel import Session
 
-from src.users.dependencies import get_current_user
+from src.users.services import get_current_user
 from .schemas import PaginatedTaskResponse, TaskInSchema, TaskOutSchema, TaskUpdateSchema
 from .services import create_task, update_task, delete_task, get_tasks
 from src.db.models import User
@@ -10,7 +10,6 @@ from src.db.session import get_session
 
 
 router = APIRouter()
-
 
 @router.get("", response_model=PaginatedTaskResponse)
 def list_my_tasks(

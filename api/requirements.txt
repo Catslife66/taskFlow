@@ -8,6 +8,7 @@ python-dotenv
 python-multipart
 psycopg2-binary
 httpx
+redis>=6.0.0
 SQLAlchemy
 sqlmodel
 uvicorn[standard]

@@ -6,7 +6,7 @@ from .schemas import TaskInSchema, TaskUpdateSchema
 from src.core.exceptions import TASK_NOT_FOUND_ERR
 from src.db.session import get_session
 from src.db.models import User, Task
-from src.users.dependencies import get_current_user
+from src.users.services import get_current_user
 
 
 def create_task(
