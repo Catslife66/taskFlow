@@ -11,7 +11,7 @@
 
 📌**Later improvements**:
 
-- cursor pagination, sorting
+- sorting
 - more indexes when data grows
 
 ## Phase 2: Frontend MVP (Next.js) + Nginx routing
@@ -34,30 +34,36 @@
 📌 **Later improvements**:
 
 - TanStack Query
-- Better UX polish (toasts, optimistic updates everywhere)
+- Better UX polish (optimistic updates everywhere)
 
 ## Phase 3: Migrate sessions to Redis
 
-    - Store sessions in Redis (instead of Postgres)
-    - Keep Postgres for users/tasks
-    - Add session TTL, refresh behavior, revoke all devices
+✅ Done:
+
+- Store sessions in Redis (instead of Postgres)
+- Keep Postgres for users/tasks
+- Add session TTL, refresh behavior, revoke all devices
+
+📌**Later improvements**:
+
+- keep redis String to store session for Phase 3 and upgrade to Hash in Phase 5
 
 ## Phase 4: Production deployment + HTTPS
 
-    - EC2 deploy
-    - Nginx handles HTTPS (Let’s Encrypt)
-    - secure cookies:
-        - Secure=true in prod
-        - SameSite tuned
-    - environment split:
-        - dev compose vs prod compose
+- EC2 deploy
+- Nginx handles HTTPS (Let’s Encrypt)
+- secure cookies:
+  - Secure=true in prod
+  - SameSite tuned
+- environment split:
+  - dev compose vs prod compose
 
 ## Phase 5: Observability and reliability improvements
 
-    - structured logging (JSON logs)
-    - metrics (Prometheus/Grafana or simpler)
-    - tracing (OpenTelemetry) optional
-    - health checks + restart policies
-    - rate limiting in Nginx for login
-    - timeouts at Nginx + app level
-    - alerting (even simple)
+- structured logging (JSON logs)
+- metrics (Prometheus/Grafana or simpler)
+- tracing (OpenTelemetry) optional
+- health checks + restart policies
+- rate limiting in Nginx for login
+- timeouts at Nginx + app level
+- alerting (even simple)

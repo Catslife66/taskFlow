@@ -52,7 +52,7 @@ TaskFlow is a task management web application built to practice industry-standar
   - created_at
   - updated_at
 
-- Sessions (Phase 1: Postgres)
+- Sessions
   - id (UUID, primary key)
   - user_id (fk)
   - created_at

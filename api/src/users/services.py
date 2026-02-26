@@ -32,15 +32,29 @@ def authenticate_user(payload: UserInSchema, session: Session = Depends(get_sess
 def _session_key(session_id:str) -> str:
     return f"session:{session_id}"
 
+def _user_sessions_key(user_id: str) -> str:
+    return f"user_sessions:{user_id}"
+
 def create_session(user_id: str) -> str:
     r = get_redis()
     session_id = str(uuid4())
     r.setex(_session_key(session_id), SESSION_TTL_SECONDS, user_id)
+    r.sadd(_user_sessions_key(user_id), session_id)
     return session_id
 
 def revoke_session(session_id: str) -> None:
     r = get_redis()
+    user_id = r.get(_session_key(session_id))
     r.delete(_session_key(session_id))
+    if user_id:
+        r.srem(_user_sessions_key(user_id), session_id)
+
+def revoke_all_sessions(user_id: str) -> None:
+    r = get_redis()
+    sess_ids = r.smembers(_user_sessions_key(user_id))
+    for sess_id in sess_ids:
+        r.delete(_session_key(sess_id))
+    r.delete(_user_sessions_key(user_id))
 
 def get_current_user(
     session_id: str | None = Cookie(default=None, alias=SESSION_COOKIE_NAME),

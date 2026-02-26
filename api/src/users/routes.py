@@ -1,8 +1,10 @@
+from os import path
+
 from fastapi import APIRouter, Cookie, Depends, Response
 from sqlmodel import Session
 
 from .schemas import UserInSchema, UserOutSchema
-from .services import register_user, authenticate_user, create_session, revoke_session, get_current_user
+from .services import register_user, authenticate_user, create_session, revoke_all_sessions, revoke_session, get_current_user
 from src.core.config import SESSION_COOKIE_NAME, COOKIE_SECURE, COOKIE_SAMESITE
 from src.db.models import User
 from src.db.session import get_session
@@ -40,6 +42,15 @@ def logout(
     if session_id:
         revoke_session(session_id)
     response.delete_cookie(key=SESSION_COOKIE_NAME, path="/")
+    return {"ok": True}
+
+@router.post('/logout-all')
+def logout_all_devices(
+    response:Response,
+    user: User = Depends(get_current_user)
+):
+    revoke_all_sessions(str(user.id))
+    response.delete_cookie(key=SESSION_COOKIE_NAME, path='/')
     return {"ok": True}
 
 @router.get("/me", response_model=UserOutSchema)
