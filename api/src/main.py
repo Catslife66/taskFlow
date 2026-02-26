@@ -1,4 +1,4 @@
-from decouple import config as decouple_config
+from decouple import Csv, config as decouple_config
 from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,12 +10,7 @@ from src.tasks.routes import router as tasks_router
 
 app = FastAPI()
 
-DEBUG = decouple_config("ENV", default='dev') == 'dev'
-allow_origins=[]
-
-if DEBUG:
-    origins = decouple_config("ALLOW_ORIGINS", default="http://localhost:3000")
-    allow_origins = origins.split(",")
+allow_origins=decouple_config("ALLOW_ORIGINS", default="http://localhost:3000", cast=Csv())
 
 app.add_middleware(
     CORSMiddleware,

@@ -1,5 +1,3 @@
-from os import path
-
 from fastapi import APIRouter, Cookie, Depends, Response
 from sqlmodel import Session
 
