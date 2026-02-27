@@ -3,7 +3,7 @@ from sqlmodel import Session
 
 from .schemas import UserInSchema, UserOutSchema
 from .services import register_user, authenticate_user, create_session, revoke_all_sessions, revoke_session, get_current_user
-from src.core.config import SESSION_COOKIE_NAME, COOKIE_SECURE, COOKIE_SAMESITE
+from src.core.config import SESSION_COOKIE_NAME, COOKIE_SECURE, COOKIE_SAMESITE, DOMAIN_NAME
 from src.db.models import User
 from src.db.session import get_session
 
@@ -28,6 +28,7 @@ def login(
         httponly=True,
         secure=COOKIE_SECURE,
         samesite=COOKIE_SAMESITE, 
+        domain=f".{DOMAIN_NAME}",
         path="/",
     )
     return {"ok": True}
@@ -48,7 +49,7 @@ def logout_all_devices(
     user: User = Depends(get_current_user)
 ):
     revoke_all_sessions(str(user.id))
-    response.delete_cookie(key=SESSION_COOKIE_NAME, path='/')
+    response.delete_cookie(key=SESSION_COOKIE_NAME, domain=f".{DOMAIN_NAME}", path='/')
     return {"ok": True}
 
 @router.get("/me", response_model=UserOutSchema)
