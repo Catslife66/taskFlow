@@ -57,7 +57,7 @@ services:
       - "80:80"
     restart: unless-stopped
     volumes:
-      - ../nginx/nginx.api.conf:/etc/nginx/nginx.api.conf:ro
+      - ../nginx/nginx.api.conf:/etc/nginx/nginx.conf:ro
     networks:
       - task_network
     depends_on:
