@@ -1,4 +1,3 @@
-from decouple import Csv, config as decouple_config
 from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware

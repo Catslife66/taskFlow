@@ -1,4 +1,4 @@
-from decouple import config
+from decouple import config, Csv
 
 ENV = config("ENV", default='dev')
 COOKIE_SECURE = ENV == "prod"
