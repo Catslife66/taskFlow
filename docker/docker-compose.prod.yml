@@ -58,11 +58,19 @@ services:
     restart: unless-stopped
     volumes:
       - ../nginx/nginx.api.conf:/etc/nginx/nginx.conf:ro
+      - ../nginx/certbot/www:/var/www/certbot:ro
+      - ../nginx/certbot/conf:/etc/letsencrypt:ro
     networks:
       - task_network
     depends_on:
       api:
         condition: service_healthy
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ../nginx/certbot/www:/var/www/certbot
+      - ../nginx/certbot/conf:/etc/letsencrypt
 
 networks:
   task_network:

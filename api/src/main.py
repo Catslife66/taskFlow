@@ -3,6 +3,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
+from src.core.config import ALLOW_ORIGINS
 from src.core.exceptions import http_exception_handler, validation_exception_handler, unhandled_exception_handler
 from src.users.routes import router as users_router
 from src.tasks.routes import router as tasks_router
@@ -10,11 +11,9 @@ from src.tasks.routes import router as tasks_router
 
 app = FastAPI()
 
-allow_origins=decouple_config("ALLOW_ORIGINS", default="http://localhost:3000", cast=Csv())
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allow_origins,
+    allow_origins=ALLOW_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
