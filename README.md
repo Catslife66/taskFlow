@@ -91,7 +91,7 @@ TaskFlow is a task management web application built to practice industry-standar
     - frontend
     - backend API
     - Postgres
-    - Redis (included early for learning, optional initially)
+    - Redis
     - Nginx
   - Volumes for:
     - Postgres
