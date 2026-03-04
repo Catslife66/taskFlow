@@ -35,6 +35,8 @@ venv/
 .venv/
 env/
 ENV/
+*key
+*.pub
 
 # Python tooling
 .pytest_cache/
